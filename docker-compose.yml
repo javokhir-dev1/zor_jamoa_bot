@@ -47,5 +47,16 @@ services:
     volumes:
       - .:/app
 
+  webapp:
+    build:
+      context: .
+      dockerfile: Dockerfile.webapp
+    container_name: zor_jamoa_webapp
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+
 volumes:
   postgres_data:
