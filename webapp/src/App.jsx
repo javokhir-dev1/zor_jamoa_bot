@@ -9,11 +9,12 @@ import { IconLock }  from "./components/Icons";
 
 // Toshkent vaqti bo'yicha buyurtma ochiqmi?
 function isOrderOpen() {
+  // Toshkent = UTC+5, offset = 5 * 60 = 300 daqiqa
   const now = new Date();
-  const tashkent = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Tashkent" }));
-  const h = tashkent.getHours();
-  const m = tashkent.getMinutes();
-  const totalMinutes = h * 60 + m;
+  const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
+  const tashkentMs = utcMs + 5 * 60 * 60000;
+  const tashkent = new Date(tashkentMs);
+  const totalMinutes = tashkent.getHours() * 60 + tashkent.getMinutes();
   // 00:00 dan 13:55 gacha ochiq
   return totalMinutes < 13 * 60 + 55;
 }
