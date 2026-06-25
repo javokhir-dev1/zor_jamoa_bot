@@ -17,6 +17,15 @@ router = APIRouter()
 
 
 # ---------------------------------------------------------------------------
+# GET /orders/status — buyurtma ochiqmi? (server Toshkent vaqti bo'yicha)
+# ---------------------------------------------------------------------------
+
+@router.get("/status")
+async def order_status():
+    return {"is_open": is_order_open()}
+
+
+# ---------------------------------------------------------------------------
 # GET /orders/my — mening bugungi buyurtmalarim
 # ---------------------------------------------------------------------------
 

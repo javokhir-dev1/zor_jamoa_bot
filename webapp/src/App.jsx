@@ -7,18 +7,6 @@ import AdminApp      from "./pages/admin/AdminApp";
 import { Spinner }   from "./components/Spinner";
 import { IconLock }  from "./components/Icons";
 
-// Toshkent vaqti bo'yicha buyurtma ochiqmi?
-function isOrderOpen() {
-  // Toshkent = UTC+5, offset = 5 * 60 = 300 daqiqa
-  const now = new Date();
-  const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
-  const tashkentMs = utcMs + 5 * 60 * 60000;
-  const tashkent = new Date(tashkentMs);
-  const totalMinutes = tashkent.getHours() * 60 + tashkent.getMinutes();
-  // 00:00 dan 13:55 gacha ochiq
-  return totalMinutes < 13 * 60 + 55;
-}
-
 const IS_ADMIN_ROUTE = window.location.pathname.startsWith("/admin");
 
 export default function App() {
@@ -45,11 +33,6 @@ export default function App() {
     if (IS_ADMIN_ROUTE) {
       detectAdminView();
     } else {
-      // Oddiy foydalanuvchi — vaqt tekshiruvi
-      if (!isOrderOpen()) {
-        setView("closed");
-        return;
-      }
       detectUserView();
     }
   }, []);
@@ -65,10 +48,18 @@ export default function App() {
     }
   }
 
-  // / yo'lida: dept_head yoki oddiy hodim
+  // / yo'lida: server vaqtini tekshir, keyin role aniqlash
   async function detectUserView() {
     try {
       const { default: client } = await import("./api/client");
+
+      // Vaqtni serverdan olamiz — qurilma timezone'ga bog'liq emas
+      const { data } = await client.get("/orders/status");
+      if (!data.is_open) {
+        setView("closed");
+        return;
+      }
+
       try {
         await client.get("/departments/my-dept/members");
         setView("dept_head");
